@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useAppSelector } from '../../hooks/useAppDispatch';
+import { useAppSelector } from '../../hooks/useAppSelector';
 import { selectUserName, selectUserRole, logoutAsync } from '../../store/slices/authSlice';
 import { useAppDispatch } from '../../hooks/useAppDispatch';
 
