@@ -1,6 +1,6 @@
 // src/App.jsx
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 
 // Import Public Pages
 import HomePage from './pages/Public/HomePage';
@@ -74,11 +74,7 @@ const AppContent = () => {
 };
 
 const App = () => {
-  return (
-    <Router>
-      <AppContent />
-    </Router>
-  );
+  return <AppContent />;
 };
 
 export default App;
