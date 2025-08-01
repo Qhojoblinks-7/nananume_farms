@@ -1,10 +1,12 @@
 // src/services/api.js
-import { getToken, logoutUser } from './auth'; // Assuming auth.js now only stores/retrieves token
-const API_BASE_URL = 'http://localhost:8080/Nananom/public'; // Get base URL from Vite env
+import { getToken, logoutUser } from './auth';
+
+// Update the API base URL to match our backend
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/nananom-farms-backend';
 
 /**
  * Custom fetch wrapper to handle API requests, including JWT authorization.
- * @param {string} endpoint - The API endpoint (e.g., '/services', '/login').
+ * @param {string} endpoint - The API endpoint (e.g., '/api/enquiries', '/api/admin/auth').
  * @param {Object} [options={}] - Standard fetch options (method, headers, body, etc.).
  * @param {boolean} [requiresAuth=true] - Whether the request requires a JWT token.
  * @returns {Promise<any>} - A promise that resolves with the parsed JSON data.
@@ -23,7 +25,6 @@ const api = async (endpoint, options = {}, requiresAuth = true) => {
       headers['Authorization'] = `Bearer ${token}`;
     } else {
       // If a protected endpoint is called without a token, consider it unauthorized
-      // This is a client-side check before even sending the request
       console.warn(`Attempted to access protected endpoint ${endpoint} without a token.`);
       logoutUser(); // Log out in case of stale state
       window.location.href = '/login'; // Redirect to login
@@ -32,8 +33,6 @@ const api = async (endpoint, options = {}, requiresAuth = true) => {
   }
 
   try {
-    // FIX: Removed the redundant '/api' from the URL construction.
-    // The VITE_API_BASE_URL environment variable should now include '/api' if your backend uses it.
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
       headers,
@@ -47,7 +46,6 @@ const api = async (endpoint, options = {}, requiresAuth = true) => {
         console.error('Unauthorized response (401). Logging out...');
         logoutUser();
         window.location.href = '/login'; // Redirect to login page
-        // Prevent further execution for this request
         throw new Error(errorData.message || 'Unauthorized. Please log in again.');
       } else if (response.status === 403) {
         throw new Error(errorData.message || 'Forbidden: You do not have permission to perform this action.');
@@ -78,5 +76,5 @@ export const post = (endpoint, body, options = {}, requiresAuth = true) => api(e
 export const put = (endpoint, body, options = {}, requiresAuth = true) => api(endpoint, { method: 'PUT', body: JSON.stringify(body), ...options }, requiresAuth);
 export const del = (endpoint, options = {}, requiresAuth = true) => api(endpoint, { method: 'DELETE', ...options }, requiresAuth);
 
-// This new `api` utility is what other service files (like `serviceService.js`) should now import.
+// This new `api` utility is what other service files should now import.
 export default api;

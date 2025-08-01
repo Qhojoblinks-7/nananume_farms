@@ -1,6 +1,6 @@
 // src/App.jsx
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 
 // Import Public Pages
 import HomePage from './pages/Public/HomePage';
@@ -57,13 +57,10 @@ const AppContent = () => {
           <Route path="/register" element={<RegisterPage />} />
 
           {/* Protected Routes */}
-          <Route element={<PrivateRoute roles={['Administrator']} />}>
+          <Route element={<PrivateRoute roles={['admin']} />}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
           </Route>
-          <Route element={<PrivateRoute roles={['Customer']} />}>
-            <Route path="/customer/dashboard" element={<CustomerDashboard />} />
-          </Route>
-          <Route element={<PrivateRoute roles={['Support Agent']} />}>
+          <Route element={<PrivateRoute roles={['agent']} />}>
             <Route path="/agent/dashboard" element={<AgentDashboard />} />
           </Route>
 
@@ -77,11 +74,7 @@ const AppContent = () => {
 };
 
 const App = () => {
-  return (
-    <Router>
-      <AppContent />
-    </Router>
-  );
+  return <AppContent />;
 };
 
 export default App;
