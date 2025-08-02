@@ -6,8 +6,12 @@ import { NavLink } from 'react-router-dom'; // Import NavLink for sidebar
 import CalendarView from '../../components/CalendarView'; // Import CalendarView component
 
 const AgentDashboard = () => {
+  console.log('🏠 AgentDashboard component mounted');
+  
   const userId = getToken();
   const roleName = getUserRole();
+  
+  console.log('👤 AgentDashboard user info:', { userId: userId ? '***' : 'N/A', roleName });
 
   // State for fetched data and UI status
   const [loading, setLoading] = useState(true);
@@ -24,15 +28,24 @@ const AgentDashboard = () => {
   const [recentEnquiries, setRecentEnquiries] = useState([]);
 
   useEffect(() => {
+    console.log('🔄 AgentDashboard useEffect triggered - fetching data');
+    
     const fetchData = async () => {
+      console.log('📊 Starting to fetch dashboard data...');
       setLoading(true);
       setError(null); // Clear previous errors
       try {
         // Fetch all appointments and enquiries to calculate stats and populate recent lists
+        console.log('📡 Making API calls to fetch bookings and enquiries...');
         const [appointmentsData, enquiriesData] = await Promise.all([
           getAllBookings(),
           getAllEnquiries(),
         ]);
+        
+        console.log('📥 Dashboard data received:', {
+          appointmentsCount: appointmentsData?.length || 0,
+          enquiriesCount: enquiriesData?.length || 0
+        });
 
         // Calculate dashboard stats based on fetched data
         setDashboardStats({

@@ -14,11 +14,22 @@ const USER_NAME_KEY = 'userName';
  * @param {string} userName - The username of the authenticated user.
  */
 export const storeAuthData = (token, role, userId, userName) => {
+  console.log('💾 Storing auth data:', { token: token ? '***' : 'N/A', role, userId, userName });
+  
   localStorage.setItem(TOKEN_KEY, token);
   localStorage.setItem(USER_ROLE_KEY, role);
   localStorage.setItem(USER_ID_KEY, userId);
   localStorage.setItem(USER_NAME_KEY, userName);
-  console.log('Auth data stored:', { token: token ? '***' : 'N/A', role, userId, userName });
+  
+  // Verify storage
+  const storedToken = localStorage.getItem(TOKEN_KEY);
+  const storedRole = localStorage.getItem(USER_ROLE_KEY);
+  
+  console.log('✅ Auth data stored and verified:', { 
+    tokenStored: !!storedToken, 
+    roleStored: !!storedRole,
+    storedRole 
+  });
 };
 
 /**
@@ -105,28 +116,51 @@ export const loginAdmin = async (credentials) => {
  * @throws {Error} If login fails.
  */
 export const loginAgent = async (credentials) => {
+  console.log('🔐 loginAgent called with credentials:', { username: credentials.username, password: '***' });
+  
   try {
+    console.log('📡 Making API request to /api/agent/auth');
+    
     const response = await post('/api/agent/auth', {
       action: 'login',
       email: credentials.username, // Map username to email for agent login
       password: credentials.password
     }, {}, false);
 
+    console.log('📥 API response received:', { 
+      success: response?.success, 
+      hasToken: !!response?.token, 
+      hasUser: !!response?.user 
+    });
+
     if (response && response.success && response.token && response.user) {
       const { token, user } = response;
+      console.log('✅ Login successful, storing auth data...');
+      
       storeAuthData(token, 'agent', user.id, user.email);
-      return {
+      
+      const result = {
         token,
         role: 'agent',
         userId: user.id,
         userName: user.email,
         user
       };
+      
+      console.log('🎉 loginAgent returning result:', { 
+        hasToken: !!result.token, 
+        role: result.role, 
+        userId: result.userId, 
+        userName: result.userName 
+      });
+      
+      return result;
     } else {
+      console.error('❌ Login response missing required data:', response);
       throw new Error('Login response missing required data.');
     }
   } catch (error) {
-    console.error('Agent login failed:', error.message);
+    console.error('💥 Agent login failed:', error.message);
     throw error;
   }
 };

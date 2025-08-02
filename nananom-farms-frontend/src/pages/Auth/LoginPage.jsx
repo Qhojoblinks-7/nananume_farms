@@ -37,9 +37,21 @@ const LoginPage = () => {
 
   // Handle navigation after successful login
   useEffect(() => {
+    console.log('🔍 LoginPage Navigation Effect:', {
+      authSuccess,
+      authLoading,
+      loginType,
+      hasNavigate: !!navigate
+    });
+
     if (authSuccess && !authLoading) {
+      console.log('🚀 Attempting navigation after successful login');
+      
       // Add a small delay to ensure localStorage is updated
       const timer = setTimeout(() => {
+        const targetPath = loginType === 'admin' ? '/admin/dashboard' : '/agent/dashboard';
+        console.log('📍 Navigating to:', targetPath);
+        
         // Navigate based on login type
         if (loginType === 'admin') {
           navigate('/admin/dashboard');
@@ -48,7 +60,10 @@ const LoginPage = () => {
         }
       }, 100); // 100ms delay to ensure localStorage is updated
       
-      return () => clearTimeout(timer);
+      return () => {
+        console.log('⏰ Clearing navigation timer');
+        clearTimeout(timer);
+      };
     }
   }, [authSuccess, authLoading, loginType, navigate]);
 
@@ -61,18 +76,26 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('🔐 Login form submitted:', { loginType, credentials: { ...credentials, password: '***' } });
+    
     setError('');
     setLoading(true);
 
     try {
       if (loginType === 'admin') {
+        console.log('👑 Attempting admin login...');
         await dispatch(loginAdminAsync(credentials)).unwrap();
+        console.log('✅ Admin login successful');
       } else {
+        console.log('👤 Attempting agent login...');
         await dispatch(loginAgentAsync(credentials)).unwrap();
+        console.log('✅ Agent login successful');
       }
     } catch (err) {
+      console.error('❌ Login failed:', err.message);
       setError(err.message || 'Login failed. Please try again.');
     } finally {
+      console.log('🏁 Login process completed, setting loading to false');
       setLoading(false);
     }
   };

@@ -28,10 +28,13 @@ export const loginAdminAsync = createAsyncThunk(
 export const loginAgentAsync = createAsyncThunk(
   'auth/loginAgent',
   async (credentials, { rejectWithValue }) => {
+    console.log('🔄 loginAgentAsync thunk started');
     try {
       const response = await loginAgent(credentials);
+      console.log('✅ loginAgentAsync thunk completed successfully');
       return response;
     } catch (error) {
+      console.error('❌ loginAgentAsync thunk failed:', error.message);
       return rejectWithValue(error.message);
     }
   }
@@ -138,10 +141,18 @@ const authSlice = createSlice({
       
       // Login Agent
       .addCase(loginAgentAsync.pending, (state) => {
+        console.log('⏳ loginAgentAsync.pending - setting loading to true');
         state.loading = true;
         state.error = null;
       })
       .addCase(loginAgentAsync.fulfilled, (state, action) => {
+        console.log('✅ loginAgentAsync.fulfilled - updating state with:', {
+          hasToken: !!action.payload.token,
+          role: action.payload.role,
+          userId: action.payload.userId,
+          userName: action.payload.userName
+        });
+        
         state.loading = false;
         state.token = action.payload.token;
         state.role = action.payload.role;
@@ -149,8 +160,11 @@ const authSlice = createSlice({
         state.userName = action.payload.userName;
         state.isAuthenticated = true;
         state.success = 'Agent login successful';
+        
+        console.log('🎯 Redux state updated, success message set');
       })
       .addCase(loginAgentAsync.rejected, (state, action) => {
+        console.error('❌ loginAgentAsync.rejected - setting error:', action.payload);
         state.loading = false;
         state.error = action.payload;
       })

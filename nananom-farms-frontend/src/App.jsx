@@ -29,6 +29,8 @@ import PrivateRoute from './components/PrivateRoute';
 const AppContent = () => {
   const location = useLocation();
 
+  console.log('🌐 AppContent rendered, current location:', location.pathname);
+
   // Define paths where the Navbar and Footer should NOT be shown
   const noHeaderFooterPaths = [
     '/login',
@@ -40,6 +42,12 @@ const AppContent = () => {
 
   // Check if the current path is in the noHeaderFooterPaths array
   const showHeaderFooter = !noHeaderFooterPaths.includes(location.pathname);
+  
+  console.log('🎨 AppContent layout decision:', { 
+    pathname: location.pathname, 
+    showHeaderFooter,
+    isDashboard: location.pathname.includes('/dashboard')
+  });
 
   return (
     <div className="flex flex-col min-h-screen">
