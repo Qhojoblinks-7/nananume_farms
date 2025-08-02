@@ -60,7 +60,7 @@ function handleAgentRegistration($db, $data) {
 
     if ($stmt->execute([$email, $password_hash, $full_name])) {
         $agent_id = $db->lastInsertId();
-        $token = Auth::generateToken($agent_id, 'agent', $full_name);
+        $token = Auth::generateToken($agent_id, 'agent', $email);
 
         echo json_encode([
             'success' => true,
@@ -107,7 +107,7 @@ function handleAgentLogin($db, $data) {
     }
 
     if (Auth::verifyPassword($password, $agent['password_hash'])) {
-        $token = Auth::generateToken($agent['id'], 'agent', $agent['username']);
+        $token = Auth::generateToken($agent['id'], 'agent', $agent['email']);
 
         echo json_encode([
             'success' => true,

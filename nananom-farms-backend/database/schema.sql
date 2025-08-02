@@ -33,6 +33,8 @@ CREATE TABLE enquiries (
     company VARCHAR(100),
     subject VARCHAR(200) NOT NULL,
     message TEXT NOT NULL,
+    preferred_date DATE,
+    preferred_time TIME,
     status ENUM('pending', 'in_progress', 'resolved', 'closed') DEFAULT 'pending',
     assigned_to INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
