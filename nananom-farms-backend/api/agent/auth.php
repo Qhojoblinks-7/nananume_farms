@@ -8,8 +8,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
-require_once __DIR__ . '/../../config/database.php';
-require_once __DIR__ . '/../../includes/auth.php';
+require_once dirname(__DIR__, 2) . '/config/database.php';
+require_once dirname(__DIR__, 2) . '/includes/auth.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -32,45 +32,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 function handleAgentRegistration($db, $data) {
-    $username = $data['username'] ?? '';
     $email = $data['email'] ?? '';
     $password = $data['password'] ?? '';
     $full_name = $data['full_name'] ?? '';
-    $phone = $data['phone'] ?? '';
-    $region = $data['region'] ?? '';
 
-    if (empty($username) || empty($email) || empty($password) || empty($full_name)) {
+    if (empty($email) || empty($password) || empty($full_name)) {
         http_response_code(400);
-        echo json_encode(['error' => 'Username, email, password, and full name are required']);
+        echo json_encode(['error' => 'Email, password, and full name are required']);
         return;
     }
 
-    $check_query = "SELECT id FROM support_agents WHERE username = ? OR email = ?";
+    $check_query = "SELECT id FROM support_agents WHERE full_name = ? OR email = ?";
     $check_stmt = $db->prepare($check_query);
-    $check_stmt->execute([$username, $email]);
+    $check_stmt->execute([$full_name, $email]);
 
     if ($check_stmt->fetch()) {
         http_response_code(400);
-        echo json_encode(['error' => 'Username or email already exists']);
+        echo json_encode(['error' => 'Full name or email already exists']);
         return;
     }
 
     $password_hash = Auth::hashPassword($password);
 
-    $query = "INSERT INTO support_agents (username, email, password_hash, full_name, phone, region) 
-              VALUES (?, ?, ?, ?, ?, ?)";
+    $query = "INSERT INTO support_agents (email, password_hash, full_name) 
+              VALUES (?, ?, ?)";
     $stmt = $db->prepare($query);
 
-    if ($stmt->execute([$username, $email, $password_hash, $full_name, $phone, $region])) {
+    if ($stmt->execute([$email, $password_hash, $full_name])) {
         $agent_id = $db->lastInsertId();
-        $token = Auth::generateToken($agent_id, 'agent', $username);
+        $token = Auth::generateToken($agent_id, 'agent', $full_name);
 
         echo json_encode([
             'success' => true,
             'token' => $token,
             'user' => [
                 'id' => $agent_id,
-                'username' => $username,
                 'email' => $email,
                 'full_name' => $full_name,
                 'user_type' => 'agent'
@@ -92,7 +88,7 @@ function handleAgentLogin($db, $data) {
         return;
     }
 
-    $query = "SELECT id, username, email, password_hash, full_name, phone, region, is_active 
+    $query = "SELECT id, email, password_hash, full_name, is_active 
               FROM support_agents WHERE email = ?";
     $stmt = $db->prepare($query);
     $stmt->execute([$email]);

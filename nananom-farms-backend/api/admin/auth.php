@@ -20,8 +20,8 @@ if (file_exists($env_file)) {
     }
 }
 
-require_once '../../config/database.php';
-require_once '../../includes/auth.php';
+require_once dirname(__DIR__, 2) . '/config/database.php';
+require_once dirname(__DIR__, 2) . '/includes/auth.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -68,7 +68,7 @@ function handleAdminLogin($db, $data) {
 
         // Get admin credentials from environment variables
         $admin_username = $_ENV['ADMIN_USERNAME'] ?? 'admin';
-        $admin_password = $_ENV['ADMIN_PASSWORD'] ?? 'admin123';
+        $admin_password = $_ENV['ADMIN_PASSWORD'] ?? 'temporary_hash';
 
         // Check if credentials match environment variables
         if ($username === $admin_username && $password === $admin_password) {

@@ -34,14 +34,13 @@ function handleCreateEnquiry($db) {
     
     $full_name = $data['full_name'] ?? '';
     $email = $data['email'] ?? '';
-    $contact = $data['contact'] ?? '';
     $company = $data['company'] ?? '';
     $subject = $data['subject'] ?? '';
     $message = $data['message'] ?? '';
 
-    if (empty($full_name) || empty($email) || empty($contact) || empty($subject) || empty($message)) {
+    if (empty($full_name) || empty($email) || empty($subject) || empty($message)) {
         http_response_code(400);
-        echo json_encode(['error' => 'Full name, email, contact, subject, and message are required']);
+        echo json_encode(['error' => 'Full name, email, subject, and message are required']);
         return;
     }
 
@@ -52,11 +51,11 @@ function handleCreateEnquiry($db) {
         return;
     }
 
-    $query = "INSERT INTO enquiries (full_name, email, contact, company, subject, message) 
+    $query = "INSERT INTO enquiries (full_name, email, company, subject, message) 
               VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = $db->prepare($query);
     
-    if ($stmt->execute([$full_name, $email, $contact, $company, $subject, $message])) {
+    if ($stmt->execute([$full_name, $email, $company, $subject, $message])) {
         $enquiry_id = $db->lastInsertId();
         echo json_encode([
             'success' => true,

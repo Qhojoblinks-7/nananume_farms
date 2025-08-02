@@ -78,10 +78,10 @@ const RegisterPage = () => {
             <input
               type="text"
               id="name"
-              name="name"
+              full_name="name"
               className="mt-1 block w-full px-4 py-2 border border-[##086920] rounded-lg shadow-sm focus:ring-[#FFB703] focus:border-[#FFB703] text-[#2F2F2F] placeholder-[##086920] bg-white transition-all duration-300 ease-in-out hover:border-[#FFB703]" /* Primary Green border, Golden Wheat focus/hover, Dark Charcoal text, Primary Green placeholder */
               placeholder="John Doe"
-              value={name}
+              value={full_name}
               onChange={(e) => setName(e.target.value)}
               required
             />

@@ -1,6 +1,6 @@
 <?php
 // Load environment variables
-$env_file = __DIR__ . '/.env';
+$env_file = __DIR__ . './.env';
 if (file_exists($env_file)) {
     $lines = file($env_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {

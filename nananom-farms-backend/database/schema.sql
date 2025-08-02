@@ -17,12 +17,9 @@ CREATE TABLE admin (
 -- Support agents table
 CREATE TABLE support_agents (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     full_name VARCHAR(100) NOT NULL,
-    phone VARCHAR(20),
-    region VARCHAR(100),
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -33,7 +30,6 @@ CREATE TABLE enquiries (
     id INT PRIMARY KEY AUTO_INCREMENT,
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
-    contact VARCHAR(20) NOT NULL,
     company VARCHAR(100),
     subject VARCHAR(200) NOT NULL,
     message TEXT NOT NULL,
@@ -72,4 +68,3 @@ CREATE INDEX idx_enquiries_assigned_to ON enquiries(assigned_to);
 CREATE INDEX idx_bookings_status ON bookings(status);
 CREATE INDEX idx_bookings_assigned_to ON bookings(assigned_to);
 CREATE INDEX idx_support_agents_email ON support_agents(email);
-CREATE INDEX idx_support_agents_username ON support_agents(username);
