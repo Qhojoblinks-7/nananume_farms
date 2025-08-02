@@ -2,7 +2,7 @@
 import { getToken, logoutUser } from './auth';
 
 // Update the API base URL to match our backend
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/nananom-farms-backend';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 /**
  * Custom fetch wrapper to handle API requests, including JWT authorization.
