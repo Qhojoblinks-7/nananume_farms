@@ -47,23 +47,15 @@ const LoginPage = () => {
     if (authSuccess && !authLoading) {
       console.log('🚀 Attempting navigation after successful login');
       
-      // Add a small delay to ensure localStorage is updated
-      const timer = setTimeout(() => {
-        const targetPath = loginType === 'admin' ? '/admin/dashboard' : '/agent/dashboard';
-        console.log('📍 Navigating to:', targetPath);
-        
-        // Navigate based on login type
-        if (loginType === 'admin') {
-          navigate('/admin/dashboard');
-        } else {
-          navigate('/agent/dashboard');
-        }
-      }, 100); // 100ms delay to ensure localStorage is updated
+      const targetPath = loginType === 'admin' ? '/admin/dashboard' : '/agent/dashboard';
+      console.log('📍 Navigating to:', targetPath);
       
-      return () => {
-        console.log('⏰ Clearing navigation timer');
-        clearTimeout(timer);
-      };
+      // Navigate based on login type
+      if (loginType === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/agent/dashboard');
+      }
     }
   }, [authSuccess, authLoading, loginType, navigate]);
 

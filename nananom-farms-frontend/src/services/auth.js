@@ -14,22 +14,14 @@ const USER_NAME_KEY = 'userName';
  * @param {string} userName - The username of the authenticated user.
  */
 export const storeAuthData = (token, role, userId, userName) => {
-  console.log('💾 Storing auth data:', { token: token ? '***' : 'N/A', role, userId, userName });
+  console.log('💾 Storing auth data:', { role, userId, userName });
   
   localStorage.setItem(TOKEN_KEY, token);
   localStorage.setItem(USER_ROLE_KEY, role);
   localStorage.setItem(USER_ID_KEY, userId);
   localStorage.setItem(USER_NAME_KEY, userName);
   
-  // Verify storage
-  const storedToken = localStorage.getItem(TOKEN_KEY);
-  const storedRole = localStorage.getItem(USER_ROLE_KEY);
-  
-  console.log('✅ Auth data stored and verified:', { 
-    tokenStored: !!storedToken, 
-    roleStored: !!storedRole,
-    storedRole 
-  });
+  console.log('✅ Auth data stored successfully');
 };
 
 /**
@@ -46,7 +38,6 @@ export const getToken = () => {
  */
 export const getUserRole = () => {
   const role = localStorage.getItem(USER_ROLE_KEY);
-  console.log('getUserRole check:', { role });
   return role;
 };
 
@@ -72,7 +63,6 @@ export const getUserName = () => {
  */
 export const isAuthenticated = () => {
   const token = getToken();
-  console.log('isAuthenticated check:', { hasToken: !!token, token: token ? '***' : 'N/A' });
   return !!token;
 };
 
