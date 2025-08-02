@@ -54,6 +54,18 @@ switch ($path) {
     case 'api/calendar':
         require_once 'api/calendar.php';
         break;
+    case 'api/services':
+        require_once 'api/services.php';
+        break;
+    case 'api/products':
+        require_once 'api/products.php';
+        break;
+    case 'api/cart':
+        require_once 'api/cart.php';
+        break;
+    case 'api/orders':
+        require_once 'api/orders.php';
+        break;
     case '':
     case 'index.php':
         // API documentation or health check
@@ -67,7 +79,11 @@ switch ($path) {
                 'enquiries' => '/api/enquiries',
                 'bookings' => '/api/bookings',
                 'agents' => '/api/agents',
-                'calendar' => '/api/calendar'
+                'calendar' => '/api/calendar',
+                'services' => '/api/services',
+                'products' => '/api/products',
+                'cart' => '/api/cart',
+                'orders' => '/api/orders'
             ]
         ]);
         break;
