@@ -7,17 +7,23 @@ class Database {
         $host = $_ENV['DB_HOST'] ?? 'localhost';
         $db   = $_ENV['DB_NAME'] ?? 'nananom_farms';
         $user = $_ENV['DB_USER'] ?? 'root';
-        $pass = $_ENV['DB_PASS'] ?? 'Lisa6131queen';
+        $pass = $_ENV['DB_PASS'] ?? '';
 
         try {
-            $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
-            $this->connection = new PDO($dsn, $user, $pass);
-            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            // Use TCP connection with explicit port to avoid socket permission issues
+            $dsn = "mysql:host=$host;port=3306;dbname=$db;charset=utf8mb4";
+            $this->connection = new PDO($dsn, $user, $pass, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+            ]);
 
             // Create tables
             $this->createTables();
 
         } catch (PDOException $e) {
+            // Log the detailed error for debugging
+            error_log("Database connection error: " . $e->getMessage());
             throw new Exception("Database connection failed: " . $e->getMessage());
         }
     }
