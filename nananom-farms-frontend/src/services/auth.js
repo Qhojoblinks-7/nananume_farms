@@ -34,7 +34,9 @@ export const getToken = () => {
  * @returns {string | null} The user role if found, otherwise null.
  */
 export const getUserRole = () => {
-  return localStorage.getItem(USER_ROLE_KEY);
+  const role = localStorage.getItem(USER_ROLE_KEY);
+  console.log('getUserRole check:', { role });
+  return role;
 };
 
 /**
@@ -58,7 +60,9 @@ export const getUserName = () => {
  * @returns {boolean} True if a token exists, false otherwise.
  */
 export const isAuthenticated = () => {
-  return !!getToken();
+  const token = getToken();
+  console.log('isAuthenticated check:', { hasToken: !!token, token: token ? '***' : 'N/A' });
+  return !!token;
 };
 
 /**

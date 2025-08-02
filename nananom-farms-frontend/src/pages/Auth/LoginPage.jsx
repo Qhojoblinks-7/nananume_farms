@@ -38,12 +38,17 @@ const LoginPage = () => {
   // Handle navigation after successful login
   useEffect(() => {
     if (authSuccess && !authLoading) {
-      // Navigate based on login type
-      if (loginType === 'admin') {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/agent/dashboard');
-      }
+      // Add a small delay to ensure localStorage is updated
+      const timer = setTimeout(() => {
+        // Navigate based on login type
+        if (loginType === 'admin') {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/agent/dashboard');
+        }
+      }, 100); // 100ms delay to ensure localStorage is updated
+      
+      return () => clearTimeout(timer);
     }
   }, [authSuccess, authLoading, loginType, navigate]);
 
