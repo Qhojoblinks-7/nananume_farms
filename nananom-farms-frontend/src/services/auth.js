@@ -104,18 +104,18 @@ export const loginAgent = async (credentials) => {
   try {
     const response = await post('/api/agent/auth', {
       action: 'login',
-      username: credentials.username,
+      email: credentials.username, // Backend expects 'email' field
       password: credentials.password
     }, {}, false);
 
     if (response && response.success && response.token && response.user) {
       const { token, user } = response;
-      storeAuthData(token, 'agent', user.id, user.username);
+      storeAuthData(token, 'agent', user.id, user.email);
       return {
         token,
         role: 'agent',
         userId: user.id,
-        userName: user.username,
+        userName: user.email, // Use email as username for agents
         user
       };
     } else {
@@ -141,12 +141,12 @@ export const registerAgent = async (userData) => {
     
     if (response && response.success && response.token && response.user) {
       const { token, user } = response;
-      storeAuthData(token, 'agent', user.id, user.username);
+      storeAuthData(token, 'agent', user.id, user.email);
       return {
         token,
         role: 'agent',
         userId: user.id,
-        userName: user.username,
+        userName: user.email, // Use email as username for agents
         user
       };
     }
