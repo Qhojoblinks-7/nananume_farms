@@ -3,6 +3,7 @@ import { getUserRole, getToken, logoutUser } from '../../services/auth';
 import { getAllBookings } from '../../services/appointmentService';
 import { getAllEnquiries } from '../../services/enquiryService';
 import { NavLink } from 'react-router-dom'; // Import NavLink for sidebar
+import CalendarView from '../../components/CalendarView'; // Import CalendarView component
 
 const AgentDashboard = () => {
   const userId = getToken();
@@ -248,7 +249,7 @@ const AgentDashboard = () => {
             </div>
 
             {/* Recent Enquiries Section */}
-            <div className="bg-[#DAD7CD] p-6 rounded-lg shadow-lg border border-[#FFB703] animate-fadeIn" style={{ animationDelay: '0.9s' }}> {/* Soft Clay background, Golden Wheat border */}
+            <div className="bg-[#DAD7CD] p-6 rounded-lg shadow-lg border border-[#FFB703] mb-8 animate-fadeIn" style={{ animationDelay: '0.9s' }}> {/* Soft Clay background, Golden Wheat border */}
               <h3 className="text-xl font-semibold text-[##086920] mb-4">Recent Enquiries</h3> {/* Primary Green heading */}
               {recentEnquiries.length === 0 ? (
                 <p className="text-[#2F2F2F] opacity-70">No recent enquiries to display.</p> 
@@ -270,6 +271,11 @@ const AgentDashboard = () => {
               <div className="text-center mt-6">
                 <a href="#" className="text-[#086920] hover:underline font-medium text-lg transition-colors duration-200 hover:text-[#FFB703]">View All Enquiries &rarr;</a> {/* Primary Green link, Golden Wheat on hover */}
               </div>
+            </div>
+            
+            {/* Calendar View Section */}
+            <div className="mb-8 animate-fadeIn" style={{ animationDelay: '1.0s' }}>
+              <CalendarView />
             </div>
           </div>
         </main>

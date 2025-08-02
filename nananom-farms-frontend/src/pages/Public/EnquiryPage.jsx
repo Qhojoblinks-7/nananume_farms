@@ -1,8 +1,53 @@
 // src/pages/Public/EnquiryPage.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import Contact from '../../assets/images/contact.png'
+import { createEnquiry } from '../../services/enquiryService';
 
 const EnquiryPage = () => {
+  const [formData, setFormData] = useState({
+    full_name: '',
+    email: '',
+    company: '',
+    subject: '',
+    message: '',
+    preferred_date: '',
+    preferred_time: ''
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const response = await createEnquiry(formData);
+      console.log('Enquiry submitted:', response);
+      
+      // Reset form
+      setFormData({
+        full_name: '',
+        email: '',
+        company: '',
+        subject: '',
+        message: '',
+        preferred_date: '',
+        preferred_time: ''
+      });
+      
+      // Show success message
+      alert('Enquiry submitted successfully!');
+    } catch (error) {
+      console.error('Error submitting enquiry:', error);
+      alert('Error submitting enquiry. Please try again.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#DAD7CD] font-sans"> {/* Soft Clay background */}
       {/* Hero Section */}
@@ -66,16 +111,19 @@ const EnquiryPage = () => {
           {/* Enquiry Form */}
           <div className="bg-[#FFFFFF] p-8 rounded-lg shadow-xl border border-[#FFB703] animate-slideInRight" style={{ animationDelay: '0.5s' }}> {/* Pure White background, Golden Wheat border */}
             <h2 className="text-3xl font-bold text-[#086920] mb-6 text-center">Send Us a Message</h2> {/* Primary Green heading */}
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <div>
-                <label htmlFor="name" className="block text-left text-sm font-medium text-[#2F2F2F] mb-1">Your Name</label> {/* Dark Charcoal text */}
+                <label htmlFor="full_name" className="block text-left text-sm font-medium text-[#2F2F2F] mb-1">Your Name</label> {/* Dark Charcoal text */}
                 <input
                   type="text"
-                  id="name"
-                  name="name"
+                  id="full_name"
+                  name="full_name"
+                  value={formData.full_name}
+                  onChange={handleChange}
                   className="mt-1 block w-full px-4 py-2 border border-[#FFB703] rounded-lg shadow-sm focus:ring-2 focus:ring-[#086920] focus:border-transparent transition duration-150 ease-in-out" // Golden Wheat border, Primary Green focus ring
-                  placeholder="John Doe"
+                  placeholder="Kwame Enym"
                   aria-label="Your Name"
+                  required
                 />
               </div>
               <div>
@@ -84,9 +132,25 @@ const EnquiryPage = () => {
                   type="email"
                   id="email"
                   name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   className="mt-1 block w-full px-4 py-2 border border-[#FFB703] rounded-lg shadow-sm focus:ring-2 focus:ring-[#086920] focus:border-transparent transition duration-150 ease-in-out" // Golden Wheat border, Primary Green focus ring
                   placeholder="john.doe@example.com"
                   aria-label="Your Email"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="company" className="block text-left text-sm font-medium text-[#2F2F2F] mb-1">Company (Optional)</label> {/* Dark Charcoal text */}
+                <input
+                  type="text"
+                  id="company"
+                  name="company"
+                  value={formData.company}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-4 py-2 border border-[#FFB703] rounded-lg shadow-sm focus:ring-2 focus:ring-[#086920] focus:border-transparent transition duration-150 ease-in-out" // Golden Wheat border, Primary Green focus ring
+                  placeholder="Your Company Name"
+                  aria-label="Company Name"
                 />
               </div>
               <div>
@@ -95,9 +159,12 @@ const EnquiryPage = () => {
                   type="text"
                   id="subject"
                   name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
                   className="mt-1 block w-full px-4 py-2 border border-[#FFB703] rounded-lg shadow-sm focus:ring-2 focus:ring-[#086920] focus:border-transparent transition duration-150 ease-in-out" // Golden Wheat border, Primary Green focus ring
                   placeholder="Inquiry about Palm Oil Products"
                   aria-label="Enquiry Subject"
+                  required
                 />
               </div>
               <div>
@@ -105,12 +172,44 @@ const EnquiryPage = () => {
                 <textarea
                   id="message"
                   name="message"
+                  value={formData.message}
+                  onChange={handleChange}
                   rows="6"
                   className="mt-1 block w-full px-4 py-2 border border-[#FFB703] rounded-lg shadow-sm focus:ring-2 focus:ring-[#086920] focus:border-transparent transition duration-150 ease-in-out resize-y" // Golden Wheat border, Primary Green focus ring
                   placeholder="Type your detailed message here..."
                   aria-label="Your Message"
+                  required
                 ></textarea>
               </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="preferred_date" className="block text-left text-sm font-medium text-[#2F2F2F] mb-1">Preferred Date</label> {/* Dark Charcoal text */}
+                  <input
+                    type="date"
+                    id="preferred_date"
+                    name="preferred_date"
+                    value={formData.preferred_date}
+                    onChange={handleChange}
+                    className="mt-1 block w-full px-4 py-2 border border-[#FFB703] rounded-lg shadow-sm focus:ring-2 focus:ring-[#086920] focus:border-transparent transition duration-150 ease-in-out" // Golden Wheat border, Primary Green focus ring
+                    aria-label="Preferred Date"
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="preferred_time" className="block text-left text-sm font-medium text-[#2F2F2F] mb-1">Preferred Time</label> {/* Dark Charcoal text */}
+                  <input
+                    type="time"
+                    id="preferred_time"
+                    name="preferred_time"
+                    value={formData.preferred_time}
+                    onChange={handleChange}
+                    className="mt-1 block w-full px-4 py-2 border border-[#FFB703] rounded-lg shadow-sm focus:ring-2 focus:ring-[#086920] focus:border-transparent transition duration-150 ease-in-out" // Golden Wheat border, Primary Green focus ring
+                    aria-label="Preferred Time"
+                  />
+                </div>
+              </div>
+              
               <button
                 type="submit"
                 className="w-full bg-[#FFB703] text-[#2F2F2F] font-bold py-3 px-6 rounded-lg shadow-md hover:bg-[#086920] hover:text-[#FFFFFF] transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FFB703]" // Golden Wheat button, Dark Charcoal text, Primary Green hover, Pure White hover text, Golden Wheat focus ring

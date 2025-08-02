@@ -3,7 +3,8 @@ import {
   getAllEnquiries, 
   createEnquiry, 
   updateEnquiry, 
-  getEnquiryStats 
+  getEnquiryStats,
+  getEnquiriesForCalendar
 } from '../../services/enquiryService';
 
 // Async thunks
@@ -12,6 +13,18 @@ export const fetchEnquiriesAsync = createAsyncThunk(
   async (filters = {}, { rejectWithValue }) => {
     try {
       const response = await getAllEnquiries(filters);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const fetchCalendarEnquiriesAsync = createAsyncThunk(
+  'enquiries/fetchCalendarEnquiries',
+  async ({ startDate, endDate }, { rejectWithValue }) => {
+    try {
+      const response = await getEnquiriesForCalendar(startDate, endDate);
       return response;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -57,6 +70,7 @@ export const fetchEnquiryStatsAsync = createAsyncThunk(
 
 const initialState = {
   enquiries: [],
+  calendarEnquiries: [],
   stats: {
     total: 0,
     pending: 0,
@@ -119,6 +133,20 @@ const enquirySlice = createSlice({
         state.error = action.payload;
       })
       
+      // Fetch Calendar Enquiries
+      .addCase(fetchCalendarEnquiriesAsync.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCalendarEnquiriesAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        state.calendarEnquiries = action.payload.enquiries || [];
+      })
+      .addCase(fetchCalendarEnquiriesAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      
       // Create Enquiry
       .addCase(createEnquiryAsync.pending, (state) => {
         state.loading = true;
@@ -148,6 +176,12 @@ const enquirySlice = createSlice({
         const index = state.enquiries.findIndex(e => e.id === enquiryId);
         if (index !== -1) {
           state.enquiries[index] = { ...state.enquiries[index], ...updates };
+        }
+        
+        // Also update in calendar enquiries if present
+        const calendarIndex = state.calendarEnquiries.findIndex(e => e.id === enquiryId);
+        if (calendarIndex !== -1) {
+          state.calendarEnquiries[calendarIndex] = { ...state.calendarEnquiries[calendarIndex], ...updates };
         }
         
         state.success = action.payload.response.message || 'Enquiry updated successfully';
@@ -183,6 +217,7 @@ export const {
 
 // Selectors
 export const selectEnquiries = (state) => state.enquiries.enquiries;
+export const selectCalendarEnquiries = (state) => state.enquiries.calendarEnquiries;
 export const selectEnquiryStats = (state) => state.enquiries.stats;
 export const selectEnquiryPagination = (state) => state.enquiries.pagination;
 export const selectEnquiryFilters = (state) => state.enquiries.filters;

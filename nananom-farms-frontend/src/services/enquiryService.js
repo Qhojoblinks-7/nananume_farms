@@ -31,6 +31,23 @@ export const createEnquiry = async (enquiryData) => {
   }
 };
 
+// Get enquiries for calendar view
+export const getEnquiriesForCalendar = async (startDate, endDate) => {
+  try {
+    const queryParams = new URLSearchParams({
+      date_from: startDate,
+      date_to: endDate
+    });
+    
+    const endpoint = `/api/enquiries?${queryParams.toString()}`;
+    const data = await get(endpoint);
+    return data;
+  } catch (error) {
+    console.error('Error fetching calendar enquiries:', error.message);
+    throw error;
+  }
+};
+
 // Admin, Support Agent - Update an enquiry (e.g., change status, assign agent)
 export const updateEnquiry = async (enquiryId, enquiryData) => {
   try {

@@ -37,6 +37,8 @@ function handleCreateEnquiry($db) {
     $company = $data['company'] ?? '';
     $subject = $data['subject'] ?? '';
     $message = $data['message'] ?? '';
+    $preferred_date = $data['preferred_date'] ?? null;
+    $preferred_time = $data['preferred_time'] ?? null;
 
     if (empty($full_name) || empty($email) || empty($subject) || empty($message)) {
         http_response_code(400);
@@ -51,11 +53,21 @@ function handleCreateEnquiry($db) {
         return;
     }
 
-    $query = "INSERT INTO enquiries (full_name, email, company, subject, message) 
-              VALUES (?, ?, ?, ?, ?, ?)";
+    // Validate date if provided
+    if ($preferred_date) {
+        $date_obj = DateTime::createFromFormat('Y-m-d', $preferred_date);
+        if (!$date_obj || $date_obj->format('Y-m-d') !== $preferred_date) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Invalid date format. Use YYYY-MM-DD']);
+            return;
+        }
+    }
+
+    $query = "INSERT INTO enquiries (full_name, email, company, subject, message, preferred_date, preferred_time) 
+              VALUES (?, ?, ?, ?, ?, ?, ?)";
     $stmt = $db->prepare($query);
     
-    if ($stmt->execute([$full_name, $email, $company, $subject, $message])) {
+    if ($stmt->execute([$full_name, $email, $company, $subject, $message, $preferred_date, $preferred_time])) {
         $enquiry_id = $db->lastInsertId();
         echo json_encode([
             'success' => true,
@@ -79,6 +91,8 @@ function handleGetEnquiries($db) {
 
     $status = $_GET['status'] ?? '';
     $assigned_to = $_GET['assigned_to'] ?? '';
+    $date_from = $_GET['date_from'] ?? '';
+    $date_to = $_GET['date_to'] ?? '';
     $page = max(1, intval($_GET['page'] ?? 1));
     $limit = min(50, max(1, intval($_GET['limit'] ?? 10)));
     $offset = ($page - 1) * $limit;
@@ -94,6 +108,16 @@ function handleGetEnquiries($db) {
     if ($assigned_to) {
         $where_conditions[] = "assigned_to = ?";
         $params[] = $assigned_to;
+    }
+
+    if ($date_from) {
+        $where_conditions[] = "preferred_date >= ?";
+        $params[] = $date_from;
+    }
+
+    if ($date_to) {
+        $where_conditions[] = "preferred_date <= ?";
+        $params[] = $date_to;
     }
 
     // Agents can only see enquiries assigned to them or unassigned ones
@@ -115,7 +139,7 @@ function handleGetEnquiries($db) {
               FROM enquiries e 
               LEFT JOIN support_agents sa ON e.assigned_to = sa.id 
               $where_clause 
-              ORDER BY e.created_at DESC 
+              ORDER BY e.preferred_date ASC, e.preferred_time ASC, e.created_at DESC 
               LIMIT ? OFFSET ?";
     
     $params[] = $limit;
