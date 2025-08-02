@@ -3,8 +3,6 @@
 require_once '../config/database.php';
 
 
-
-
 try {
     $database = new Database();
     $db = $database->getConnection();
