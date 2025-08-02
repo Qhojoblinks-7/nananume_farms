@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { registerUser } from '../../services/auth'; // Import the register function
+import { registerAgent } from '../../services/auth'; // Import the register function
 
 const RegisterPage = () => {
-  const [name, setName] = useState('');
+  const [full_name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -26,13 +26,13 @@ const RegisterPage = () => {
 
     try {
       const userData = {
-        name,
+        full_name,
         email,
         password,
         confirm_password: confirmPassword, // Ensure this matches your backend's expected field name
         role: 'Customer', // Default role for registration, based on your backend API documentation
       };
-      const data = await registerUser(userData);
+      const data = await registerAgent(userData);
       console.log('Registration successful:', data);
       setSuccess('Registration successful! Redirecting to login...');
       // Optionally, clear form fields after successful registration

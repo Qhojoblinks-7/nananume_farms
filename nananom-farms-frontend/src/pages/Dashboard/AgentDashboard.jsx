@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getUserRole, getToken, logoutUser } from '../../services/auth';
-import { getAllAppointments } from '../../services/appointmentService';
+import { getAllBookings } from '../../services/appointmentService';
 import { getAllEnquiries } from '../../services/enquiryService';
 import { NavLink } from 'react-router-dom'; // Import NavLink for sidebar
 
@@ -29,7 +29,7 @@ const AgentDashboard = () => {
       try {
         // Fetch all appointments and enquiries to calculate stats and populate recent lists
         const [appointmentsData, enquiriesData] = await Promise.all([
-          getAllAppointments(),
+          getAllBookings(),
           getAllEnquiries(),
         ]);
 

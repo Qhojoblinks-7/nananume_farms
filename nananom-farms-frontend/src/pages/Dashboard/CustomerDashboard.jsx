@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getUserRole, getToken, logoutUser } from '../../services/auth';
-import { getAllAppointments } from '../../services/appointmentService'; // To get customer's appointments
+import { getAllBookings } from '../../services/appointmentService'; // To get customer's appointments
 import { getAllEnquiries } from '../../services/enquiryService';    // To get customer's enquiries
 import { getAllServices } from '../../src/config/serviceService';// To show available services or subscribed ones
 import { NavLink } from 'react-router-dom'; // Import NavLink for sidebar
@@ -35,7 +35,7 @@ const CustomerDashboard = () => {
         // on the frontend here. Backend filtering is more secure and efficient.
 
         const [appointmentsData, enquiriesData, servicesData] = await Promise.all([
-          getAllAppointments(), // Assuming this returns appointments for the logged-in user
+          getAllBookings(), // Assuming this returns appointments for the logged-in user
           getAllEnquiries(),    // Assuming this returns enquiries for the logged-in user
           getAllServices(),     // Public services available to book
         ]);

@@ -8,8 +8,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
-require_once '../../config/database.php';
-require_once '../../includes/auth.php';
+require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../includes/auth.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -45,28 +45,26 @@ function handleAgentRegistration($db, $data) {
         return;
     }
 
-    // Check if username or email already exists
     $check_query = "SELECT id FROM support_agents WHERE username = ? OR email = ?";
     $check_stmt = $db->prepare($check_query);
     $check_stmt->execute([$username, $email]);
-    
+
     if ($check_stmt->fetch()) {
         http_response_code(400);
         echo json_encode(['error' => 'Username or email already exists']);
         return;
     }
 
-    // Hash password and create agent
     $password_hash = Auth::hashPassword($password);
-    
+
     $query = "INSERT INTO support_agents (username, email, password_hash, full_name, phone, region) 
               VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = $db->prepare($query);
-    
+
     if ($stmt->execute([$username, $email, $password_hash, $full_name, $phone, $region])) {
         $agent_id = $db->lastInsertId();
         $token = Auth::generateToken($agent_id, 'agent', $username);
-        
+
         echo json_encode([
             'success' => true,
             'token' => $token,
@@ -75,8 +73,6 @@ function handleAgentRegistration($db, $data) {
                 'username' => $username,
                 'email' => $email,
                 'full_name' => $full_name,
-                'phone' => $phone,
-                'region' => $region,
                 'user_type' => 'agent'
             ]
         ]);
@@ -87,20 +83,19 @@ function handleAgentRegistration($db, $data) {
 }
 
 function handleAgentLogin($db, $data) {
-    $username = $data['username'] ?? '';
+    $email = $data['email'] ?? '';
     $password = $data['password'] ?? '';
 
-    if (empty($username) || empty($password)) {
+    if (empty($email) || empty($password)) {
         http_response_code(400);
-        echo json_encode(['error' => 'Username and password are required']);
+        echo json_encode(['error' => 'Email and password are required']);
         return;
     }
 
-    // Find agent by username or email
     $query = "SELECT id, username, email, password_hash, full_name, phone, region, is_active 
-              FROM support_agents WHERE username = ? OR email = ?";
+              FROM support_agents WHERE email = ?";
     $stmt = $db->prepare($query);
-    $stmt->execute([$username, $username]);
+    $stmt->execute([$email]);
     $agent = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$agent) {
@@ -117,17 +112,14 @@ function handleAgentLogin($db, $data) {
 
     if (Auth::verifyPassword($password, $agent['password_hash'])) {
         $token = Auth::generateToken($agent['id'], 'agent', $agent['username']);
-        
+
         echo json_encode([
             'success' => true,
             'token' => $token,
             'user' => [
                 'id' => $agent['id'],
-                'username' => $agent['username'],
                 'email' => $agent['email'],
                 'full_name' => $agent['full_name'],
-                'phone' => $agent['phone'],
-                'region' => $agent['region'],
                 'user_type' => 'agent'
             ]
         ]);

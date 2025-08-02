@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { getUserRole, getToken, logoutUser } from '../../services/auth';
-import { getAdminDashboardStats } from '../../services/dashboardService';
+import { getDashboardData } from '../../services/dashboardService';
 import { getAllServices } from '../../src/config/serviceService'; // This path might need re-checking if 'src' is directly under root
 import { getAllUsers } from '../../services/userService';
 
@@ -29,7 +29,7 @@ const AdminDashboard = () => {
       setError(null);
       try {
         const [stats, servicesData, usersData] = await Promise.all([
-          getAdminDashboardStats(),
+          getDashboardData(),
           getAllServices(),
           getAllUsers(),
         ]);

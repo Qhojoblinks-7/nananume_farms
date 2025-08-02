@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { loginUser } from '../../services/auth'; // Import the login function
+import { loginAgent } from '../../services/auth'; // Import the login function
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -15,9 +15,9 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      // Call the loginUser function from auth.js
+      // Call the loginAgen function from auth.js
       // It will handle storing the token, role, and userId in localStorage
-      const data = await loginUser({ email, password });
+      const data = await loginAgent({ email, password });
       console.log('Login successful:', data);
 
       // 'data' here will contain { token, role, userId } as returned by loginUser in auth.js
