@@ -42,13 +42,13 @@ function handleAgentRegistration($db, $data) {
         return;
     }
 
-    $check_query = "SELECT id FROM support_agents WHERE full_name = ? OR email = ?";
+    $check_query = "SELECT id FROM support_agents WHERE email = ?";
     $check_stmt = $db->prepare($check_query);
-    $check_stmt->execute([$full_name, $email]);
+    $check_stmt->execute([$email]);
 
     if ($check_stmt->fetch()) {
         http_response_code(400);
-        echo json_encode(['error' => 'Full name or email already exists']);
+        echo json_encode(['error' => 'Email already exists']);
         return;
     }
 
