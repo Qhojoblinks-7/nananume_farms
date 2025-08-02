@@ -4,18 +4,14 @@ class Database {
     private $connection;
 
     public function __construct() {
-        $host = $_ENV['DB_HOST'] ?? 'localhost';
-        $db   = $_ENV['DB_NAME'] ?? 'nananom_farms';
-        $user = $_ENV['DB_USER'] ?? 'root';
-        $pass = $_ENV['DB_PASS'] ?? '';
-
+        // Use SQLite for easier testing
+        $db_path = __DIR__ . '/../database/nananom_farms.db';
+        
         try {
-            // Use TCP connection with explicit port to avoid socket permission issues
-            $dsn = "mysql:host=$host;port=3306;dbname=$db;charset=utf8mb4";
-            $this->connection = new PDO($dsn, $user, $pass, [
+            $dsn = "sqlite:$db_path";
+            $this->connection = new PDO($dsn, null, null, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false,
             ]);
 
             // Create tables
@@ -35,27 +31,27 @@ class Database {
     private function createTables() {
         $sql = "
         CREATE TABLE IF NOT EXISTS admin (
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             username VARCHAR(50) UNIQUE NOT NULL,
             email VARCHAR(100) UNIQUE NOT NULL,
             password_hash VARCHAR(255) NOT NULL,
             full_name VARCHAR(100) NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
 
         CREATE TABLE IF NOT EXISTS support_agents (
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             email VARCHAR(100) UNIQUE NOT NULL,
             password_hash VARCHAR(255) NOT NULL,
             full_name VARCHAR(100) NOT NULL,
             is_active BOOLEAN DEFAULT 1,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
 
         CREATE TABLE IF NOT EXISTS enquiries (
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             full_name VARCHAR(100) NOT NULL,
             email VARCHAR(100) NOT NULL,
             company VARCHAR(100),
@@ -63,18 +59,18 @@ class Database {
             message TEXT NOT NULL,
             preferred_date DATE,
             preferred_time TIME,
-            urgency_level ENUM('low', 'medium', 'high', 'urgent') DEFAULT 'medium',
+            urgency_level VARCHAR(20) DEFAULT 'medium',
             follow_up_date DATE,
             follow_up_notes TEXT,
             status VARCHAR(20) DEFAULT 'pending',
-            assigned_to INT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            assigned_to INTEGER,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (assigned_to) REFERENCES support_agents(id)
         );
 
         CREATE TABLE IF NOT EXISTS bookings (
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             full_name VARCHAR(100) NOT NULL,
             email VARCHAR(100) NOT NULL,
             contact VARCHAR(20) NOT NULL,
@@ -84,46 +80,46 @@ class Database {
             booking_time TIME,
             additional_notes TEXT,
             status VARCHAR(20) DEFAULT 'pending',
-            assigned_to INT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            assigned_to INTEGER,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (assigned_to) REFERENCES support_agents(id)
         );
 
         CREATE TABLE IF NOT EXISTS services (
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             name VARCHAR(255) NOT NULL,
             description TEXT,
             category VARCHAR(100),
-            price DECIMAL(10,2) NOT NULL,
-            duration_minutes INT DEFAULT 60,
+            price REAL NOT NULL,
+            duration_minutes INTEGER DEFAULT 60,
             is_active BOOLEAN DEFAULT 1,
             requires_booking BOOLEAN DEFAULT 1,
-            max_participants INT DEFAULT 1,
+            max_participants INTEGER DEFAULT 1,
             image_url VARCHAR(500),
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
 
         CREATE TABLE IF NOT EXISTS products (
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             name VARCHAR(255) NOT NULL,
             description TEXT,
             category VARCHAR(100),
-            price DECIMAL(10,2) NOT NULL,
-            stock_quantity INT DEFAULT 0,
+            price REAL NOT NULL,
+            stock_quantity INTEGER DEFAULT 0,
             sku VARCHAR(100) UNIQUE,
-            weight_kg DECIMAL(8,2),
+            weight_kg REAL,
             dimensions_cm VARCHAR(50),
             is_active BOOLEAN DEFAULT 1,
             is_digital BOOLEAN DEFAULT 0,
             image_url VARCHAR(500),
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
 
         CREATE TABLE IF NOT EXISTS customers (
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             full_name VARCHAR(100) NOT NULL,
             email VARCHAR(100) UNIQUE NOT NULL,
             phone VARCHAR(20),
@@ -133,55 +129,55 @@ class Database {
             postal_code VARCHAR(20),
             country VARCHAR(100) DEFAULT 'Nigeria',
             date_of_birth DATE,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
 
         CREATE TABLE IF NOT EXISTS orders (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            customer_id INT NOT NULL,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            customer_id INTEGER NOT NULL,
             order_number VARCHAR(50) UNIQUE NOT NULL,
-            order_type ENUM('product', 'service', 'mixed') DEFAULT 'product',
-            subtotal DECIMAL(10,2) NOT NULL,
-            tax_amount DECIMAL(10,2) DEFAULT 0,
-            shipping_amount DECIMAL(10,2) DEFAULT 0,
-            total_amount DECIMAL(10,2) NOT NULL,
-            status ENUM('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending',
-            payment_status ENUM('pending', 'paid', 'failed', 'refunded') DEFAULT 'pending',
+            order_type VARCHAR(20) DEFAULT 'product',
+            subtotal REAL NOT NULL,
+            tax_amount REAL DEFAULT 0,
+            shipping_amount REAL DEFAULT 0,
+            total_amount REAL NOT NULL,
+            status VARCHAR(20) DEFAULT 'pending',
+            payment_status VARCHAR(20) DEFAULT 'pending',
             payment_method VARCHAR(50),
             shipping_address TEXT,
             notes TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (customer_id) REFERENCES customers(id)
         );
 
         CREATE TABLE IF NOT EXISTS order_items (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            order_id INT NOT NULL,
-            item_type ENUM('product', 'service') NOT NULL,
-            item_id INT NOT NULL,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            order_id INTEGER NOT NULL,
+            item_type VARCHAR(20) NOT NULL,
+            item_id INTEGER NOT NULL,
             item_name VARCHAR(255) NOT NULL,
-            quantity INT NOT NULL DEFAULT 1,
-            unit_price DECIMAL(10,2) NOT NULL,
-            total_price DECIMAL(10,2) NOT NULL,
+            quantity INTEGER NOT NULL DEFAULT 1,
+            unit_price REAL NOT NULL,
+            total_price REAL NOT NULL,
             booking_date DATE,
             booking_time TIME,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (order_id) REFERENCES orders(id)
         );
 
         CREATE TABLE IF NOT EXISTS shopping_cart (
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             session_id VARCHAR(255) NOT NULL,
             customer_email VARCHAR(100),
-            item_type ENUM('product', 'service') NOT NULL,
-            item_id INT NOT NULL,
-            quantity INT NOT NULL DEFAULT 1,
+            item_type VARCHAR(20) NOT NULL,
+            item_id INTEGER NOT NULL,
+            quantity INTEGER NOT NULL DEFAULT 1,
             booking_date DATE,
             booking_time TIME,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
         ";
 
