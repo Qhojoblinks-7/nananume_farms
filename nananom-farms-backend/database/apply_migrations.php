@@ -1,6 +1,6 @@
 <?php
 // Script to apply database migrations
-require_once '../config/database.php';
+require_once dirname(__DIR__) . '/config/database.php';
 
 
 try {
